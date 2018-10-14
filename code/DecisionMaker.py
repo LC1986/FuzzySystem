@@ -53,9 +53,10 @@ class DecisionMaker:
         # set up RSI
         x = np.arange(0, 101, 1)
         self.RSI = ctrl.Antecedent(x, data.columns[1])
-        self.RSI['lo'] = fuzz.trapmf(self.RSI.universe, [0, 0, 20, 30])
-        self.RSI['me'] = fuzz.trapmf(self.RSI.universe, [20, 30, 70, 80])
-        self.RSI['hi'] = fuzz.trapmf(self.RSI.universe, [70, 80, 100, 100])
+
+        self.RSI['lo'] = fuzz.trimf(x, [0, 0, 30])
+        self.RSI['me'] = fuzz.trimf(x, [20, 50, 90])
+        self.RSI['hi'] = fuzz.trimf(x, [80, 100, 100])
 
 
         # set up MACD
@@ -64,6 +65,10 @@ class DecisionMaker:
         self.MACD['lo'] = fuzz.trapmf(self.MACD.universe, [0, 0, 20, 30])
         self.MACD['me'] = fuzz.trapmf(self.MACD.universe, [30, 50, 80, 100])
         self.MACD['hi'] = fuzz.trapmf(self.MACD.universe, [80, 100, 200, 200])
+
+        #self.MACD['lo'] = fuzz.trimf(x, [0, 0, 30])
+        #self.MACD['me'] = fuzz.trimf(x, [20, 50, 90])
+        #self.MACD['hi'] = fuzz.trimf(x, [80, 100, 100])
 
         # set up ADX
         x = np.arange(20, 101, 1)
@@ -97,31 +102,31 @@ class DecisionMaker:
         # rules 01 - 27
         # RSI & MACD & ADX -> decision (buy, hold, sell)
         rule01 = ctrl.Rule(self.RSI['hi'] & self.MACD['hi'] & self.ADX['me'], self.decision['sell'])
-        rule02 = ctrl.Rule(self.RSI['hi'] & self.MACD['me'] & self.ADX['me'], self.decision['hold'])
-        rule03 = ctrl.Rule(self.RSI['hi'] & self.MACD['lo'] & self.ADX['me'], self.decision['buy'])
+        rule02 = ctrl.Rule(self.RSI['hi'] & self.MACD['me'] & self.ADX['me'], self.decision['sell'])
+        rule03 = ctrl.Rule(self.RSI['hi'] & self.MACD['lo'] & self.ADX['me'], self.decision['sell'])
         rule04 = ctrl.Rule(self.RSI['me'] & self.MACD['hi'] & self.ADX['me'], self.decision['hold'])
-        rule05 = ctrl.Rule(self.RSI['me'] & self.MACD['me'] & self.ADX['me'], self.decision['buy'])
-        rule06 = ctrl.Rule(self.RSI['me'] & self.MACD['lo'] & self.ADX['me'], self.decision['buy'])
+        rule05 = ctrl.Rule(self.RSI['me'] & self.MACD['me'] & self.ADX['me'], self.decision['hold'])
+        rule06 = ctrl.Rule(self.RSI['me'] & self.MACD['lo'] & self.ADX['me'], self.decision['hold'])
         rule07 = ctrl.Rule(self.RSI['lo'] & self.MACD['hi'] & self.ADX['me'], self.decision['buy'])
         rule08 = ctrl.Rule(self.RSI['lo'] & self.MACD['me'] & self.ADX['me'], self.decision['buy'])
         rule09 = ctrl.Rule(self.RSI['lo'] & self.MACD['lo'] & self.ADX['me'], self.decision['buy'])
 
         rule10 = ctrl.Rule(self.RSI['hi'] & self.MACD['hi'] & self.ADX['lo'], self.decision['sell'])
         rule11 = ctrl.Rule(self.RSI['hi'] & self.MACD['me'] & self.ADX['lo'], self.decision['sell'])
-        rule12 = ctrl.Rule(self.RSI['hi'] & self.MACD['lo'] & self.ADX['lo'], self.decision['hold'])
-        rule13 = ctrl.Rule(self.RSI['me'] & self.MACD['hi'] & self.ADX['lo'], self.decision['sell'])
+        rule12 = ctrl.Rule(self.RSI['hi'] & self.MACD['lo'] & self.ADX['lo'], self.decision['sell'])
+        rule13 = ctrl.Rule(self.RSI['me'] & self.MACD['hi'] & self.ADX['lo'], self.decision['hold'])
         rule14 = ctrl.Rule(self.RSI['me'] & self.MACD['me'] & self.ADX['lo'], self.decision['hold'])
-        rule15 = ctrl.Rule(self.RSI['me'] & self.MACD['lo'] & self.ADX['lo'], self.decision['buy'])
-        rule16 = ctrl.Rule(self.RSI['lo'] & self.MACD['hi'] & self.ADX['lo'], self.decision['hold'])
+        rule15 = ctrl.Rule(self.RSI['me'] & self.MACD['lo'] & self.ADX['lo'], self.decision['hold'])
+        rule16 = ctrl.Rule(self.RSI['lo'] & self.MACD['hi'] & self.ADX['lo'], self.decision['buy'])
         rule17 = ctrl.Rule(self.RSI['lo'] & self.MACD['me'] & self.ADX['lo'], self.decision['buy'])
         rule18 = ctrl.Rule(self.RSI['lo'] & self.MACD['lo'] & self.ADX['lo'], self.decision['buy'])
 
-        rule19 = ctrl.Rule(self.RSI['hi'] & self.MACD['hi'] & self.ADX['hi'], self.decision['hold'])
-        rule20 = ctrl.Rule(self.RSI['hi'] & self.MACD['me'] & self.ADX['hi'], self.decision['buy'])
-        rule21 = ctrl.Rule(self.RSI['hi'] & self.MACD['lo'] & self.ADX['hi'], self.decision['buy'])
-        rule22 = ctrl.Rule(self.RSI['me'] & self.MACD['hi'] & self.ADX['hi'], self.decision['buy'])
-        rule23 = ctrl.Rule(self.RSI['me'] & self.MACD['me'] & self.ADX['hi'], self.decision['buy'])
-        rule24 = ctrl.Rule(self.RSI['me'] & self.MACD['lo'] & self.ADX['hi'], self.decision['buy'])
+        rule19 = ctrl.Rule(self.RSI['hi'] & self.MACD['hi'] & self.ADX['hi'], self.decision['sell'])
+        rule20 = ctrl.Rule(self.RSI['hi'] & self.MACD['me'] & self.ADX['hi'], self.decision['sell'])
+        rule21 = ctrl.Rule(self.RSI['hi'] & self.MACD['lo'] & self.ADX['hi'], self.decision['sell'])
+        rule22 = ctrl.Rule(self.RSI['me'] & self.MACD['hi'] & self.ADX['hi'], self.decision['hold'])
+        rule23 = ctrl.Rule(self.RSI['me'] & self.MACD['me'] & self.ADX['hi'], self.decision['hold'])
+        rule24 = ctrl.Rule(self.RSI['me'] & self.MACD['lo'] & self.ADX['hi'], self.decision['hold'])
         rule25 = ctrl.Rule(self.RSI['lo'] & self.MACD['hi'] & self.ADX['hi'], self.decision['buy'])
         rule26 = ctrl.Rule(self.RSI['lo'] & self.MACD['me'] & self.ADX['hi'], self.decision['buy'])
         rule27 = ctrl.Rule(self.RSI['lo'] & self.MACD['lo'] & self.ADX['hi'], self.decision['buy'])
